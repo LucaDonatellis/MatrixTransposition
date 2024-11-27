@@ -1,0 +1,34 @@
+#!/bin/bash
+# Job name
+#PBS -N serial
+# Output files
+#PBS -o ./serial.o
+#PBS -e ./serial.e
+# Queue name
+#PBS -q short_cpuQ
+# Set the maximum wall time
+#PBS -l walltime=0:02:00
+# Number of nodes, cpus, mpi processors and amount of memory
+#PBS -l select=1:ncpus=1:mem=1gb
+
+# Modules for C
+module load gcc91
+g++() {
+    g++-9.1.0 "$@"
+}
+g++ --version
+# Select the working directory
+cd /home/luca.donatellis/MatrixTransposition
+
+# The code should be compiled before submitting the job
+g++ -o serial serial.cpp -fopenmp
+
+# Run code
+for P in {4..12}; do
+    N=$((2**P))
+    echo "Executing with n = $N"
+    for I in {1..5}; do
+        echo "#$I iteration"
+        ./serial $N
+    done
+done
