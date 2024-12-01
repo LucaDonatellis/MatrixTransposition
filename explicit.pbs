@@ -1,0 +1,71 @@
+#!/bin/bash
+# Job name
+#PBS -N explicit
+# Output files
+#PBS -o ./explicit.o
+#PBS -e ./explicit.e
+# Queue name
+#PBS -q short_cpuQ
+# Set the maximum wall time
+#PBS -l walltime=0:04:00
+# Number of nodes, cpus, mpi processors and amount of memory
+#PBS -l select=1:ncpus=96:mem=1gb
+
+# Modules for C
+module load gcc91
+g++() {
+    g++-9.1.0 "$@"
+}
+g++ --version
+# Select the working directory
+cd /home/luca.donatellis/MatrixTransposition
+
+# The code should be compiled before submitting the job
+g++ -o explicit explicit.cpp -fopenmp 
+
+export OMP_NUM_THREADS=1
+# Run code
+for P in {4..12}; do
+    N=$((2**P))
+    echo "Executing with n = $N"
+    for I in {1..10}; do
+        echo "#$I iteration"
+        ./explicit $N
+    done
+done
+for T in {1..12}; do
+    export OMP_NUM_THREADS=$(($T*8))
+    # Run code
+    for P in {4..12}; do
+        N=$((2**P))
+        echo "Executing with n = $N"
+        for I in {1..10}; do
+            echo "#$I iteration"
+            ./explicit $N
+        done
+    done
+done
+g++ -o explicit explicit.cpp -fopenmp -O2 -march=native -ftree-vectorize
+
+export OMP_NUM_THREADS=1
+# Run code
+for P in {4..12}; do
+    N=$((2**P))
+    echo "Executing with n = $N"
+    for I in {1..10}; do
+        echo "#$I iteration"
+        ./explicit $N
+    done
+done
+for T in {1..12}; do
+    export OMP_NUM_THREADS=$(($T*8))
+    # Run code
+    for P in {4..12}; do
+        N=$((2**P))
+        echo "Executing with n = $N"
+        for I in {1..10}; do
+            echo "#$I iteration"
+            ./explicit $N
+        done
+    done
+done

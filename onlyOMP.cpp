@@ -22,7 +22,6 @@ int main(int argc, char **argv)
 		cout << "Argument must be a power of 2";
 		return 0;
 	}
-
 	// Matrix inizialization
 	float **M = new float *[n];
 	for (int i = 0; i < n; ++i)
@@ -39,7 +38,7 @@ int main(int argc, char **argv)
 	{
 		T[i] = new float[n];
 	}
-
+	// Code execution
 	double wstart = omp_get_wtime();
 
 	if (!checkSymOMP(n, M))
@@ -49,16 +48,15 @@ int main(int argc, char **argv)
 
 	double wend = omp_get_wtime();
 	cout << "Execution time: " << (wend - wstart) << " seconds" << endl;
-
 	//cout << isTranspose(n,M,T);
+
 	return 0;
 }
 
-// Check
 bool checkSymOMP(int n, float **matrix)
 {
 	bool sym = true;
-	#pragma omp parallel for collapse(2) reduction(&& : sym)
+	#pragma omp parallel for reduction(&& : sym)
 	for (int i = 0; i < n - 1; ++i)
 	{
 		for (int j = i + 1; j < n; ++j)
@@ -72,7 +70,6 @@ bool checkSymOMP(int n, float **matrix)
 	return sym;
 }
 
-// Transpose
 void matTransposeOMP(int n, float **matrix, float **result)
 {
 	#pragma omp parallel for collapse(2)
@@ -85,7 +82,6 @@ void matTransposeOMP(int n, float **matrix, float **result)
 	}
 }
 
-// Assert
 bool isTranspose(int n, float **matrix, float **result){
 	for (int i = 0; i < n; ++i)
 	{
